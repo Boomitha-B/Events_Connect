@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} - EventsHub{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-20">
+    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-white mb-6 group transition-colors">
+        <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Events
+    </a>
+
+    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+        <!-- Event Header / Image Area (Detects Image Brochure) -->
+        <div class="relative h-64 md:h-96 w-full group">
+            {% with b_url=event.brochure.url|lower %}
+            {% if ".jpg" in b_url or ".jpeg" in b_url or ".png" in b_url or ".webp" in b_url or ".gif" in b_url %}
+                <img src="{{ event.brochure.url }}" alt="{{ event.title }}" class="w-full h-full object-cover">
+            {% else %}
+                <div class="w-full h-full bg-gradient-to-tr from-slate-900 via-primary/20 to-secondary/20 flex flex-col items-center justify-center">
+                    <svg class="w-24 h-24 text-white/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-white/50 text-xl font-medium tracking-wide">EventsHub</span>
+                </div>
+            {% endif %}
+            {% endwith %}
+            
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/40 to-transparent"></div>
+            
+            <div class="absolute bottom-0 left-0 w-full p-6 md:p-10">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="inline-block bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        {{ event.department }}
+                    </span>
+                    <span class="inline-block bg-slate-800/80 backdrop-blur text-gray-300 text-xs font-bold px-3 py-1 border border-gray-600 rounded-full shadow-lg">
+                        👥 {{ attendee_count }} Going
+                    </span>
+                    
+                    {% if user.is_staff %}
+                    <form action="{% url 'toggle_event_status' event.id %}" method="POST" class="inline ms-auto">
+                        {% csrf_token %}
+                        {% if event.is_active %}
+                        <button type="submit" class="inline-block bg-slate-600 hover:bg-slate-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg transition-colors">
+                            Deactivate
+                        </button>
+                        {% else %}
+                        <button type="submit" class="inline-block bg-green-600/90 hover:bg-green-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg transition-colors">
+                            Activate
+                        </button>
+                        {% endif %}
+                    </form>
+                    <a href="{% url 'edit_event' event.id %}" class="inline-block bg-yellow-600/90 hover:bg-yellow-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg transition-colors">
+                        Edit
+                    </a>
+                    <form action="{% url 'delete_event' event.id %}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-block bg-red-600/90 hover:bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg transition-colors">
+                            Delete
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                
+                <h1 class="text-3xl md:text-5xl font-black text-white mb-2 leading-tight">
+                    {{ event.title }}
+                </h1>
+                <p class="text-gray-300 font-medium text-sm md:text-base flex items-center">
+                    <span>Organized by <strong class="text-white">{{ event.organizer }}</strong></span>
+                    <span class="mx-2 text-gray-600">•</span>
+                    <span>Posted {{ event.created_at|timesince }} ago</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Event Details Body -->
+        <div class="grid md:grid-cols-3 gap-8 p-6 md:p-10 bg-surface/50">
+            <!-- Left Col: Main Description -->
+            <div class="md:col-span-2 space-y-8">
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700/50 pb-2">About This Event</h3>
+                    <div class="prose prose-invert max-w-none text-gray-300 font-light leading-relaxed whitespace-pre-line">
+                        {{ event.description }}
+                    </div>
+                </div>
+
+                {% if user.is_authenticated and not user.is_staff %}
+                <div class="bg-primary/10 border border-primary/20 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
+                    <h3 class="text-lg font-bold text-white mb-2 relative flex items-center gap-2">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        {% if is_attending %}You're Going!{% else %}Interested in this Event?{% endif %}
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-5 relative">
+                        {% if is_attending %}
+                        Great! You're on the list. We'll see you there!
+                        {% else %}
+                        Click below to mark your attendance.
+                        {% endif %}
+                    </p>
+                    <form action="{% url 'rsvp_event' event.id %}" method="POST">
+                        {% csrf_token %}
+                        {% if is_attending %}
+                        <button type="submit" class="relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full text-white bg-slate-700 hover:bg-red-600 transition-colors shadow-lg w-full sm:w-auto">
+                            Not Attending
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        {% else %}
+                        <button type="submit" class="relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-full text-white bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30 w-full sm:w-auto">
+                            Attend Event
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </button>
+                        {% endif %}
+                    </form>
+                </div>
+                {% elif not user.is_authenticated %}
+                <div class="bg-slate-800/80 rounded-2xl p-6 border border-gray-700/50 text-center">
+                    <p class="text-gray-400 mb-4 font-light">Please log in to attend this event.</p>
+                    <a href="{% url 'login' %}?next={% url 'event_detail' event.id %}" class="inline-block px-8 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold rounded-full transition-all hover:scale-105 shadow-lg">
+                        Log In to Join
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Registration Link (Visible to All) -->
+                {% if event.registration_link %}
+                <div class="bg-secondary/10 border border-secondary/20 rounded-2xl p-6 mt-6">
+                    <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        Registration Form
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-4 font-light italic">Please complete the external registration form to finalize your participation:</p>
+                    <a href="{{ event.registration_link }}" target="_blank" rel="noopener noreferrer" class="relative inline-flex items-center justify-center px-8 py-3 text-sm font-bold rounded-full text-white bg-secondary hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20 w-full">
+                        Open Registration Link 
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Col: Sidebar Info -->
+            <div class="space-y-6">
+                <!-- Date & Time Card -->
+                <div class="bg-slate-800/80 rounded-2xl p-6 border border-gray-700/50">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">When & Where</h4>
+                    
+                    <div class="flex items-start gap-4 mb-5">
+                        <div class="p-3 bg-primary/10 rounded-xl text-primary mt-1">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-white">{{ event.date|date:"l, F j, Y" }}</p>
+                            <p class="text-sm text-gray-400">{{ event.time|time:"g:i A" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 mb-2">
+                        <div class="p-3 bg-secondary/10 rounded-xl text-secondary mt-1">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-white">{{ event.venue }}</p>
+                            <a href="https://maps.google.com/?q={{ event.venue }}" target="_blank" class="text-xs text-secondary hover:text-white transition-colors">See Map</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audience Card -->
+                <div class="bg-slate-800/80 rounded-2xl p-6 border border-gray-700/50">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Who Can Attend</h4>
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <p class="font-medium text-white">{{ event.target_audience }}</p>
+                    </div>
+                </div>
+
+                <!-- Brochure Card -->
+                {% if event.brochure %}
+                <div class="bg-slate-800/80 rounded-2xl p-6 border border-gray-700/50">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Official Document</h4>
+                    <a href="{{ event.brochure.url }}" target="_blank" class="flex items-center justify-between p-3 bg-secondary/10 hover:bg-secondary/20 border border-secondary/30 rounded-xl transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span class="font-medium text-white group-hover:text-secondary transition-colors">Download Brochure</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 group-hover:text-secondary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

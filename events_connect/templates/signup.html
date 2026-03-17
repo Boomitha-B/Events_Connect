@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up - EventsHub{% endblock %}
+
+{% block head %}
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8 relative">
+    <!-- Glow Effect -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-secondary/20 blur-[100px] rounded-full z-0 pointer-events-none"></div>
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center mb-6">
+        <h2 class="mt-6 text-3xl font-extrabold text-white">Join the Community</h2>
+        <p class="mt-2 text-sm text-gray-400">
+            Already have an account? <a href="{% url 'login' %}" class="font-medium text-secondary hover:text-pink-400 transition-colors">Log in here</a>
+        </p>
+    </div>
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div class="glass-card py-8 px-4 shadow-2xl sm:rounded-3xl sm:px-10 border-t border-secondary/30">
+            <form class="space-y-5" action="{% url 'signup' %}" method="POST">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="p-4 rounded-lg bg-red-900/30 border border-red-800 text-sm text-red-400 mb-4">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <p>• {{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 capitalize">{{ field.label }}</label>
+                    <div class="mt-1">
+                        <input type="{% if 'password' in field.name %}password{% elif 'email' in field.name %}email{% elif 'year' in field.name %}number{% else %}text{% endif %}"
+                               name="{{ field.name }}"
+                               id="{{ field.id_for_label }}"
+                               required
+                               class="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl shadow-sm placeholder-gray-500 text-white bg-slate-800/50 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm transition-colors">
+                    </div>
+                    {% if field.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-lg shadow-secondary/30 text-sm font-bold text-white bg-gradient-to-r from-secondary to-purple-600 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary focus:ring-offset-gray-900 transition-all hover:scale-[1.02]">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

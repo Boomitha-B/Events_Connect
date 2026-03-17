@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Host an Event - EventsHub{% endblock %}
+
+{% block head %}
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-20 relative">
+    
+    <!-- Background Glow Effect -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-primary/20 blur-[100px] rounded-full z-0 pointer-events-none"></div>
+
+    <div class="relative z-10 glass-card rounded-3xl p-8 shadow-2xl">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-white mb-2">Host an Event</h1>
+            <p class="text-gray-400">Fill in the details below to broadcast your activity to the college community.</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="p-4 mb-6 text-sm text-red-500 rounded-lg bg-red-900/30 border border-red-800" role="alert">
+                <strong>Please correct the errors below.</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+
+            <!-- Form Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Title -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Event Title <span class="text-secondary">*</span></label>
+                    <input type="text" name="title" value="{{ form.title.value|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500 transition-colors" placeholder="e.g. Annual Tech Symposium 2026">
+                </div>
+
+                <!-- Department & Organizer -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Department/Club <span class="text-secondary">*</span></label>
+                    <input type="text" name="department" value="{{ form.department.value|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500" placeholder="e.g. Computer Science">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Organizer Name <span class="text-secondary">*</span></label>
+                    <input type="text" name="organizer" value="{{ form.organizer.value|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500" placeholder="e.g. Prof. Smith or Tech Club">
+                </div>
+
+                <!-- Date & Time -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Date <span class="text-secondary">*</span></label>
+                    <input type="date" name="date" value="{{ form.date.value|date:'Y-m-d'|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Time <span class="text-secondary">*</span></label>
+                    <input type="time" name="time" value="{{ form.time.value|time:'H:i'|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert">
+                </div>
+
+                <!-- Venue & Target Audience -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Venue <span class="text-secondary">*</span></label>
+                    <input type="text" name="venue" value="{{ form.venue.value|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500" placeholder="e.g. Main Auditorium">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Who Can Attend <span class="text-secondary">*</span></label>
+                    <input type="text" name="target_audience" value="{{ form.target_audience.value|default:'All Students' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500">
+                </div>
+
+                <!-- Description (Full Width) -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Detailed Description <span class="text-secondary">*</span></label>
+                    <textarea name="description" rows="5" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500" placeholder="Describe the agenda, speakers, objectives...">{{ form.description.value|default:'' }}</textarea>
+                </div>
+
+                <!-- Reg Link & Brochure -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Registration/Form Link <span class="text-secondary">*</span></label>
+                    <input type="url" name="registration_link" value="{{ form.registration_link.value|default:'' }}" required class="w-full bg-slate-800/50 border border-gray-700 text-white rounded-xl focus:ring-primary focus:border-primary placeholder-gray-500" placeholder="https://forms.gle/...">
+                </div>
+
+                <!-- Brochure Upload -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Event Brochure (Required) <span class="text-secondary">*</span></label>
+                    
+                    {% if event.brochure %}
+                    <div class="mb-4 p-3 bg-slate-800/80 border border-gray-700 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <span class="text-sm text-gray-300">Current: <a href="{{ event.brochure.url }}" target="_blank" class="text-primary hover:underline">{{ event.brochure.name }}</a></span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex items-center justify-center w-full">
+                        <label for="dropzone-brochure" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-700 border-dashed rounded-xl cursor-pointer bg-slate-800/30 hover:bg-slate-800/80 transition-colors">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <p class="mb-2 text-sm text-gray-400"><span class="font-semibold text-white">Upload New Brochure/PDF</span></p>
+                                <p class="text-xs text-gray-500">PDF or Document formats</p>
+                            </div>
+                            <input id="dropzone-brochure" type="file" name="brochure" class="hidden" {% if not is_edit %}required{% endif %} />
+                        </label>
+                    </div>  
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="mt-8 flex items-center justify-end gap-4 pt-6 border-t border-gray-700/50">
+                <a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition-colors text-sm font-medium">Cancel</a>
+                <button type="submit" class="px-8 py-3 text-sm font-bold rounded-full text-white gradient-bg shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
+                    {% if is_edit %}Update Event{% else %}Publish Event{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Simple script to show selected file name for brochure
+    document.getElementById('dropzone-brochure').addEventListener('change', function(e) {
+        if(e.target.files.length > 0) {
+            const fileName = e.target.files[0].name;
+            const uploadText = this.previousElementSibling.querySelector('p.mb-2');
+            uploadText.innerHTML = '<span class="font-semibold text-secondary">Selected:</span> ' + fileName;
+        }
+    });
+</script>
+{% endblock %}
