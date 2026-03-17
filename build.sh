@@ -1,11 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo "BUILD START"
 
 # Install dependencies
-python3.12 -m pip install -r requirements.txt
+pip install -r requirements.txt
 
 # Collect static files
-python3.12 manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
+
+# Run migrations
+python manage.py migrate
 
 echo "BUILD END"
