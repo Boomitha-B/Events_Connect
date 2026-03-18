@@ -82,11 +82,17 @@ This ensures that **every event receives proper visibility and every student has
 ## ✨ Key Features
 
 ✔ Centralized platform for all college events
+
 ✔ Easy discovery of upcoming events
+
 ✔ Organized event information with detailed descriptions
+
 ✔ User-friendly interface for browsing events
+
 ✔ Accessible to students and external participants
+
 ✔ Responsive web design
+
 ✔ Online deployment for easy access
 
 ---
@@ -144,19 +150,31 @@ Allows users to explore various activities happening across the campus.
 
 Events-Connect
 │
+
 ├── app.py
+
 ├── requirements.txt
+
 ├── database.db
+
 │
 ├── templates/
+
 │   ├── index.html
+
 │   ├── events.html
+
 │   └── event_details.html
+
 │
 ├── static/
+
 │   ├── css/
+
 │   ├── js/
+
 │   └── images/
+
 │
 └── README.md
 
@@ -208,9 +226,6 @@ Some potential improvements for the platform include:
 ## 📬 Contact
 
 **Boomitha B**
-AI & Data Science Student
-Aspiring Machine Learning Engineer
-
 📍 Coimbatore, India
 
 GitHub:
@@ -218,4 +233,3 @@ https://github.com/Boomitha-B
 
 ---
 
-⭐ If you find this project interesting, consider giving it a **star on GitHub!**
