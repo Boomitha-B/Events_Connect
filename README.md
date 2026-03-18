@@ -148,36 +148,25 @@ Allows users to explore various activities happening across the campus.
 
 ## 📂 Project Structure
 
+```
 Events-Connect
 │
-
 ├── app.py
-
 ├── requirements.txt
-
 ├── database.db
-
 │
 ├── templates/
-
 │   ├── index.html
-
 │   ├── events.html
-
 │   └── event_details.html
-
 │
 ├── static/
-
 │   ├── css/
-
 │   ├── js/
-
 │   └── images/
-
 │
 └── README.md
-
+```
 ---
 
 ## 💻 Installation & Setup
